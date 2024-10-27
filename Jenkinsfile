@@ -20,7 +20,56 @@ pipeline {
                 '''
             }
         }
-        stage('Test') {
+
+        stage('Test') { 
+            parallel{
+                stage('Unit tests'){
+                    agent{
+                        docker{
+                            image 'node:18-alpine'
+                            reuseNode true
+                        }
+                    }
+
+                    steps{
+                        sh '''
+                            #test -f build/index.html
+                            npm test
+                        '''
+                    }
+                    post {
+                        always{
+                            junit 'test-results/junit.xml'
+                        }
+                    }
+
+                }
+
+                stage('E2E'){
+                    agent{
+                        docker{
+                            image 'mcr.microfost.com/playwight:c1.39.0-jammy'
+                            reuseNode true
+                        }
+                    }
+                    steps {
+                        sh '''
+                            npm install serve
+                            node_modules/.bin.serve -s build &
+                            sleep 10
+                            npx playwight test --reporter=html
+                        '''
+                    }
+                    pose {
+                        always {
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'path/to/your/reportDir', reportFiles: 'index.html', reportName: 'HTML Report'])
+                        }
+                    }
+                }
+            }
+            
+        }
+        stage('Deploy') {
             agent{
                 docker{
                     image 'node:18-alpine'
@@ -29,15 +78,12 @@ pipeline {
             }
             steps{
                 sh '''
-                    test -f build/index.html
-                    npm test
+                    npm install netlify-cli -g
+                    netlify --version
                 '''
             }
         }
+
     }
-    post {
-        always{
-            junit 'test-results/junit.xml'
-        }
-    }
+
 }
