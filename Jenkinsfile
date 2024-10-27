@@ -60,11 +60,11 @@ pipeline {
                             npx playwight test --reporter=html
                         '''
                     }
-                    pose {
-                        always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'path/to/your/reportDir', reportFiles: 'index.html', reportName: 'HTML Report'])
-                        }
-                    }
+                    // pose {
+                    //     always {
+                    //         publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'path/to/your/reportDir', reportFiles: 'index.html', reportName: 'HTML Report'])
+                    //     }
+                    // }
                 }
             }
             
