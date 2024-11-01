@@ -1,7 +1,7 @@
 pipeline {
     agent any
     stages {
-        stage('Hello') {
+        stage('Build') {
             agent{
                 docker{
                     image 'node:18-alpine'
@@ -20,12 +20,19 @@ pipeline {
             }
         }
         stage('Test'){
+            agent{
+                docker{
+                    image 'node:18-alpine'
+                    reuseNode true
+                }
+            }
             steps{
-                sh'''
-                    npm install jest
-                    npx jest index.html-test
+                sh '''
+                    test -f build/index.html
+                    npm test
                 '''
             }
         }
+
     }
 }
