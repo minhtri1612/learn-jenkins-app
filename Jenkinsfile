@@ -19,5 +19,12 @@ pipeline {
                 '''
             }
         }
+        stage('Test'){
+            steps{
+                sh'''
+                    npm i index.html-test
+                '''
+            }
+        }
     }
 }
