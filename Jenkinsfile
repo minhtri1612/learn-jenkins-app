@@ -102,7 +102,7 @@ pipeline {
                 }
             }
             environment {
-                CI_ENVIRONMENT_URL = '517d03c2-2413-42ae-a405-570a32f1cd8e'
+                CI_ENVIRONMENT_URL = 'https://beautiful-cranachan-2ae671.netlify.app'
             }
 
             steps {
