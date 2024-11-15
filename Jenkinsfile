@@ -1,12 +1,13 @@
 pipeline {
     agent any
 
-    environment{
+    environment {
         NETLIFY_SITE_ID = '517d03c2-2413-42ae-a405-570a32f1cd8e'
         NETLIFY_AUTH_TOKEN = credentials('netlify-token')
     }
 
     stages {
+
         stage('Build') {
             agent {
                 docker {
@@ -16,7 +17,6 @@ pipeline {
             }
             steps {
                 sh '''
-                    echo "check changes"
                     ls -la
                     node --version
                     npm --version
@@ -27,9 +27,9 @@ pipeline {
             }
         }
 
-        stage('Tests'){
-            parallel{
-                stage('Unit Tests') {
+        stage('Tests') {
+            parallel {
+                stage('Unit tests') {
                     agent {
                         docker {
                             image 'node:18-alpine'
@@ -39,7 +39,7 @@ pipeline {
 
                     steps {
                         sh '''
-                            test -f build/index.html
+                            #test -f build/index.html
                             npm test
                         '''
                     }
@@ -63,12 +63,13 @@ pipeline {
                             npm install serve
                             node_modules/.bin/serve -s build &
                             sleep 10
-                            npx playwright test --reporter=html
+                            npx playwright test  --reporter=html
                         '''
                     }
+
                     post {
                         always {
-                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'playwrightHTML local', reportTitles: '', useWrapperFileDirectly: true])
+                            publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Local', reportTitles: '', useWrapperFileDirectly: true])
                         }
                     }
                 }
@@ -84,12 +85,11 @@ pipeline {
             }
             steps {
                 sh '''
-                    npm install netlify-cli 
+                    npm install netlify-cli
                     node_modules/.bin/netlify --version
                     echo "Deploying to production. Site ID: $NETLIFY_SITE_ID"
                     node_modules/.bin/netlify status
                     node_modules/.bin/netlify deploy --dir=build --prod
-
                 '''
             }
         }
@@ -101,21 +101,22 @@ pipeline {
                     reuseNode true
                 }
             }
+
             environment {
-                CI_ENVIRONMENT_URL = 'https://beautiful-cranachan-2ae671.netlify.app'
+                CI_ENVIRONMENT_URL = 'https://67361bb84eeb9509ffba38ec--beautiful-cranachan-2ae671.netlify.app/'
             }
 
             steps {
                 sh '''
-                    npx playwright test --reporter=html
+                    npx playwright test  --reporter=html
                 '''
             }
+
             post {
                 always {
-                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'playwrightHTML E2E', reportTitles: '', useWrapperFileDirectly: true])
+                    publishHTML([allowMissing: false, alwaysLinkToLastBuild: false, keepAll: false, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright E2E', reportTitles: '', useWrapperFileDirectly: true])
                 }
             }
         }
-        
     }
 }
