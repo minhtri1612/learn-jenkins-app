@@ -88,7 +88,6 @@ pipeline {
                     npm install netlify-cli
                     node_modules/.bin/netlify --version
                     echo "deploy in site id:$NETLIFY_SITE_ID
-                   // node_modules/.bin/netlify status
                 '''
             }
         }
