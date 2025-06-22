@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     stages {
+
         stage('Build') {
             agent {
                 docker {
@@ -20,10 +21,10 @@ pipeline {
                 '''
             }
         }
-        
-        stage('Test') {
+
+        stage('Tests') {
             parallel {
-                stage('Unit Test') {
+                stage('Unit tests') {
                     agent {
                         docker {
                             image 'node:18-alpine'
@@ -42,9 +43,8 @@ pipeline {
                             junit 'jest-results/junit.xml'
                         }
                     }
-
                 }
-                
+
                 stage('E2E') {
                     agent {
                         docker {
@@ -58,7 +58,7 @@ pipeline {
                             npm install serve
                             node_modules/.bin/serve -s build &
                             sleep 10
-                            npx playwright test --reporter=html
+                            npx playwright test  --reporter=html
                         '''
                     }
 
@@ -81,9 +81,9 @@ pipeline {
             steps {
                 sh '''
                     npm install netlify-cli
-                    netlify --version
+                    node_modules/.bin/netlify --version
                 '''
             }
         }
-    }    
+    }
 }
